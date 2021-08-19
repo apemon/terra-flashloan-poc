@@ -34,10 +34,7 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         ExecuteMsg::Flashloan { recipient, amount, msg } => flashloan(deps, env, info, recipient, amount, msg),
-        ExecuteMsg::FlashloanHook {} => {
-            // check owner
-            Ok(Response::default())
-        }
+        ExecuteMsg::FlashloanHook {} => flashloan_hook(deps, env, info)
     }
 }
 
@@ -89,7 +86,8 @@ pub fn flashloan(
     Ok(Response::new()
         .add_messages(messages)
         .add_attribute("action", "flashloan")
-        .add_attribute("amount", amount.to_string()))
+        .add_attribute("amount", amount.to_string())
+        .add_attribute("prev_amount", balance.to_string()))
 }
 
 pub fn flashloan_hook(
@@ -108,7 +106,9 @@ pub fn flashloan_hook(
     if balance < tmp.prev_balance {
         return Err(ContractError::Std(StdError::generic_err("balance mismatch")));
     }
-    Ok(Response::default())
+    Ok(Response::default()
+        .add_attribute("action", "flashloan_hook")
+        .add_attribute("final_balance", balance.to_string()))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]

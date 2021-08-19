@@ -8,6 +8,7 @@ use cw_storage_plus::Item;
 pub struct Config {
     pub owner: CanonicalAddr,
     pub bank: CanonicalAddr,
+    pub counter: CanonicalAddr,
     pub flag: bool
 }
 

@@ -1,4 +1,4 @@
-import {MsgStoreCode, StdFee, LCDClient, MnemonicKey, MsgInstantiateContract} from '@terra-money/terra.js'
+import {MsgStoreCode, StdFee, LCDClient, MnemonicKey, MsgInstantiateContract, Coins, MsgExecuteContract, Wallet, MsgSend, Coin} from '@terra-money/terra.js'
 import * as fs from 'fs'
 
 const DELAY_TIME = 1000 // this to prevent unauthorization error
@@ -86,6 +86,40 @@ export const init = async (
         throw err
     }
 };
+
+export const execute = async (
+    wallet,
+    addr,
+    execute_msg,
+    coins?,
+    fee='1500000uusd'
+) => {
+    let coin = new Coins()
+    if(coins)
+        coin = Coins.fromString(coins)
+    const tx = await wallet.createAndSignTx({
+      msgs: [new MsgExecuteContract(wallet.key.accAddress, addr, execute_msg, coin)],
+      fee: new StdFee(GAS_LIMIT, fee),
+    });
+    const response = await terra.tx.broadcast(tx);
+    await delay(DELAY_TIME)
+    return response;
+}
+
+export const transfer = async (wallet:Wallet, addr, coins, fee='1500000uusd') => {
+    
+    const tx = await wallet.createAndSignTx({
+        msgs: [new MsgSend(
+            wallet.key.accAddress,
+            addr,
+            Coins.fromString(coins)
+        )],
+        fee: new StdFee(GAS_LIMIT, fee),
+    })
+    const response = await terra.tx.broadcast(tx)
+    await delay(DELAY_TIME)
+    return response;
+}
 
 export const query = async (addr, msg) => {
     const response = await terra.wasm.contractQuery(addr,msg)

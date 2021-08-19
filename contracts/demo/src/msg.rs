@@ -5,7 +5,8 @@ use flashloan::bank::{FlashloanReceiveMsg};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {
-    pub bank_addr: Addr
+    pub bank_addr: Addr,
+    pub counter_addr: Addr
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
